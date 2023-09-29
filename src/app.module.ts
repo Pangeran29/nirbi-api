@@ -14,6 +14,8 @@ import { LoggerModule } from '@app/common';
       validationSchema: Joi.object({
         PORT: Joi.string().required(),
         DATABASE_URL: Joi.string().required(),
+        APP_NAME: Joi.string().required(),
+        PREFIX_NAME: Joi.string().required(),
       })
     }),
   ],
