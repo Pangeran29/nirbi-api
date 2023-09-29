@@ -31,7 +31,7 @@ async function bootstrap() {
   );
 
   // build swagger
-  await SwaggerBuildFactory(app);
+  SwaggerBuildFactory(app);
   
   await app.listen(configService.getOrThrow('PORT'), async () => {
     const prefix = configService.getOrThrow('PREFIX_NAME')

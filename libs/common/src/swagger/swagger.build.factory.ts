@@ -7,7 +7,7 @@ import {
   SwaggerModule
 } from '@nestjs/swagger';
 
-export async function SwaggerBuildFactory(app: INestApplication) {
+export function SwaggerBuildFactory(app: INestApplication) {
   const configService = app.get(ConfigService);
 
   const appName = configService.get('APP_NAME');
@@ -15,9 +15,8 @@ export async function SwaggerBuildFactory(app: INestApplication) {
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle(appName)
-    .setDescription(`The ${appName} API description`)
+    .setDescription(`The ${appName} API Documentation`)
     .setVersion('1.0')
-    .addServer(`/${prefix}`)
     .addBearerAuth()
     .build();
 
