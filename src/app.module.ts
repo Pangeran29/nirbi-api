@@ -1,11 +1,13 @@
+import * as Joi from 'joi';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import * as Joi from 'joi';
+import { LoggerModule } from '@app/common';
 
 @Module({
   imports: [
+    LoggerModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
@@ -13,9 +15,9 @@ import * as Joi from 'joi';
         PORT: Joi.string().required(),
         DATABASE_URL: Joi.string().required(),
       })
-    })
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
