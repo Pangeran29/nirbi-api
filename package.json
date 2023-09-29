@@ -1,8 +1,8 @@
 {
   "name": "api",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "Backend Application for Near By",
+  "author": "jo",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
