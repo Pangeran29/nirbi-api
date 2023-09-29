@@ -16,10 +16,10 @@ import { LoggerModule } from '@app/common';
         DATABASE_URL: Joi.string().required(),
         APP_NAME: Joi.string().required(),
         PREFIX_NAME: Joi.string().required(),
-      })
+      }),
     }),
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

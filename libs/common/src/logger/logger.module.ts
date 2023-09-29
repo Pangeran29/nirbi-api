@@ -11,9 +11,9 @@ import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
       useFactory: async (config: ConfigService) => {
         // logs rotation
         const today = new Date();
-        const date = today.getUTCDate()
-        const month = today.getUTCMonth()
-        const year = today.getUTCFullYear()
+        const date = today.getUTCDate();
+        const month = today.getUTCMonth();
+        const year = today.getUTCFullYear();
         const logName = `${date}-${month}-${year}`;
 
         return {
@@ -22,8 +22,8 @@ import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
             transport: {
               target: 'pino-pretty',
               options: {
-                singleLine: true
-              }
+                singleLine: true,
+              },
             },
             stream: pino.destination({
               dest: `./logs/${logName}`, // omit for stdout,
@@ -31,10 +31,10 @@ import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
               minLength: 16383, // Buffer before writing
               sync: false, // Asynchronous logging
             }),
-          }
+          },
         };
-      }
-    })
-  ]
+      },
+    }),
+  ],
 })
-export class LoggerModule { }
+export class LoggerModule {}

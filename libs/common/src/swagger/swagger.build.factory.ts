@@ -4,7 +4,7 @@ import {
   DocumentBuilder,
   SwaggerCustomOptions,
   SwaggerDocumentOptions,
-  SwaggerModule
+  SwaggerModule,
 } from '@nestjs/swagger';
 
 export function SwaggerBuildFactory(app: INestApplication) {
@@ -22,21 +22,21 @@ export function SwaggerBuildFactory(app: INestApplication) {
 
   const swaggerDocumentOptions: SwaggerDocumentOptions = {
     operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,
-    ignoreGlobalPrefix: true
+    ignoreGlobalPrefix: true,
   };
 
   const document = SwaggerModule.createDocument(
     app,
     swaggerConfig,
-    swaggerDocumentOptions
+    swaggerDocumentOptions,
   );
 
   const customOptions: SwaggerCustomOptions = {
     customSiteTitle: `${appName} API Docs`,
     swaggerOptions: {
       tagsSorter: 'alpha',
-      operationsSorter: 'alpha'
-    }
+      operationsSorter: 'alpha',
+    },
   };
 
   SwaggerModule.setup(`/${prefix}/docs`, app, document, customOptions);

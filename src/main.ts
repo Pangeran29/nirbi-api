@@ -6,17 +6,14 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerBuildFactory } from '@app/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(
-    AppModule,
-    { bufferLogs: true }
-  )
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
 
   // set default logger using pino
-  app.useLogger(app.get(Logger))
-  const logger = app.get(Logger)
+  app.useLogger(app.get(Logger));
+  const logger = app.get(Logger);
 
-  // get configuration file 
-  const configService = app.get(ConfigService)
+  // get configuration file
+  const configService = app.get(ConfigService);
 
   // set global validation pipes
   app.useGlobalPipes(
@@ -32,9 +29,9 @@ async function bootstrap() {
 
   // build swagger
   SwaggerBuildFactory(app);
-  
+
   await app.listen(configService.getOrThrow('PORT'), async () => {
-    const prefix = configService.getOrThrow('PREFIX_NAME')
+    const prefix = configService.getOrThrow('PREFIX_NAME');
     logger.error(`Swagger is running on: ${await app.getUrl()}/${prefix}/docs`);
     logger.error(`Application is running on: ${await app.getUrl()}`);
   });
