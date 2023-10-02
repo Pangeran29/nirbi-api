@@ -4,10 +4,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { LoggerModule } from '@app/common';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
-    LoggerModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
@@ -18,6 +19,9 @@ import { LoggerModule } from '@app/common';
         PREFIX_NAME: Joi.string().required(),
       }),
     }),
+    LoggerModule,
+    AuthModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
