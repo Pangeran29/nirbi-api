@@ -1,40 +1,33 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
+import { LoginDto } from './dto/login.dto';
+import { AuthMethod, User } from '@prisma/client';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly userService: UserService
-  ) {}
+  ) { }
 
-  async validateUser(username: string, pass: string): Promise<any> {
-    const user = await this.userService.findOne(username);
-    if (user && user.password === pass) {
-      const { password, ...result } = user;
-      return result;
+  async validateUser(email: string, pass?: string): Promise<any> {
+    const user = await this.userService.findUserByEmail(email);
+    delete user.password;
+    if (user.auth_method === AuthMethod.GOOGLE_OAUTH) {
+      return user;
+    } else if (user && user.password === pass) {
+      return user;
     }
     return null;
   }
 
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  async register(registerDto: RegisterDto) {
+    return await this.userService.create(registerDto);
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  async login(user: User) {
+    return { token: "abcdflkas adsfjd adsfjadsf askdfj ad" };
   }
 }

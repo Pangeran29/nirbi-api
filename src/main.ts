@@ -7,6 +7,9 @@ import { SwaggerBuildFactory } from '@app/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  
+  // enable cors 
+  app.enableCors();
 
   // set default logger using pino
   app.useLogger(app.get(Logger));
@@ -32,8 +35,8 @@ async function bootstrap() {
 
   await app.listen(configService.getOrThrow('PORT'), async () => {
     const prefix = configService.getOrThrow('PREFIX_NAME');
-    logger.error(`Swagger is running on: ${await app.getUrl()}/${prefix}/docs`);
-    logger.error(`Application is running on: ${await app.getUrl()}`);
+    logger.warn(`Swagger is running on: ${await app.getUrl()}/${prefix}/docs`);
+    logger.warn(`Application is running on: ${await app.getUrl()}`);
   });
 }
 bootstrap();

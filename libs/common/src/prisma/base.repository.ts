@@ -1,5 +1,7 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import { FindManyRecordDto } from '../dto';
+import { RecordNotFoundException } from '../exception/prisma/record-not-found.exception';
+import { RecordNotCreatedException } from '../exception/prisma/record-not-created.exception';
 
 export abstract class BaseRepository<T> {
   protected prisma: PrismaClient;
@@ -11,7 +13,11 @@ export abstract class BaseRepository<T> {
   }
 
   async create(data: Partial<T>): Promise<T> {
-    return await this.prisma[this.model].create({ data });
+    try {
+      return await this.prisma[this.model].create({ data });
+    } catch (error) {
+      throw new RecordNotCreatedException(error);
+    }
   }
 
   async update(id: number, data: Partial<T>): Promise<T> {
@@ -36,10 +42,14 @@ export abstract class BaseRepository<T> {
     return deleteRecord;
   }
 
-  async findById(id: number): Promise<T | null> {
-    return await this.prisma[this.model].findUnique({
-      where: { id },
+  async findUnique(uniqueFieldName: string, value: string): Promise<T | null> {
+    const record = await this.prisma[this.model].findUnique({
+      where: { [uniqueFieldName]: value }
     });
+    // if (!record) {
+    //   throw new RecordNotFoundException();
+    // }
+    return record;
   }
 
   async count(): Promise<number> {

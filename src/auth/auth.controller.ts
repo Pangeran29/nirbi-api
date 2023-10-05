@@ -1,52 +1,66 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { LoginDto } from './dto/login.dto';
+import { GoogleOauthGuard } from '@app/common/guard/google-oauth.guard';
+import { Response } from 'express';
+import { UserGooglePayload } from '@app/common';
+import { UserService } from 'src/user/user.service';
+import { RegisterDto } from './dto/register.dto';
+import { User } from '@prisma/client';
 
-@ApiTags('auth')
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+  ) { }
+
+  @ApiOperation({
+    description: "Used in client side to redirect to Google Oauth"
+  })
+  @Get('google')
+  @UseGuards(GoogleOauthGuard)
+  async auth() { }
+
+  @ApiOperation({
+    deprecated: true,
+    description: "This Api only used in backend side (no need to implement in client side)"
+  })
+  @Get('google/callback')
+  @UseGuards(GoogleOauthGuard)
+  async googleAuthCallback(@Req() req, @Res() res: Response) {    
+    const { email, name }: UserGooglePayload = req?.user;
+    const user = await this.userService.findUserByEmail(email);
+    if (!user) {
+      const registerData = new RegisterDto();
+      registerData.email = email;
+      registerData.name = name;
+      console.log(registerData);
+      registerData['a'] = 'x';
+      console.log(registerData);
+      await this.authService.register(registerData);
+    }
+    const validUser = await this.authService.validateUser(email);
+    const userLogin = await this.authService.login(user);
+    res.json({ ...validUser, ...userLogin }).status(200);
+  }
 
   @UseGuards(AuthGuard('local'))
-  @Post('login')
+  @Post('local-login')
   async login(
     @Req() req,
     @Body() loginDto: LoginDto
   ) {
-    return req.user;
+    const user: User = req?.user;
+    const token = await this.authService.login(user);
+    return { ...user, ...token };
   }
 
-  @Post()
-  register(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
-  }
-
-  @Post()
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.authService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+  @Post('local-register')
+  register(@Body() createAuthDto) {
+    // return this.authService.create(createAuthDto);
   }
 }
