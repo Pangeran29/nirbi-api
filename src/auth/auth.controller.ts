@@ -38,9 +38,6 @@ export class AuthController {
       const registerData = new RegisterDto();
       registerData.email = email;
       registerData.name = name;
-      console.log(registerData);
-      registerData['a'] = 'x';
-      console.log(registerData);
       await this.authService.register(registerData);
     }
     const validUser = await this.authService.validateUser(email);
