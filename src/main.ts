@@ -1,8 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Logger } from 'nestjs-pino';
 import { ConfigService } from '@nestjs/config';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { SwaggerBuildFactory } from '@app/common';
 
 async function bootstrap() {
@@ -12,8 +11,7 @@ async function bootstrap() {
   app.enableCors();
 
   // set default logger using pino
-  app.useLogger(app.get(Logger));
-  const logger = app.get(Logger);
+  const logger = new Logger('NestApplication');
 
   // get configuration file
   const configService = app.get(ConfigService);
