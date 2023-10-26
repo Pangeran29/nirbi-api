@@ -8,7 +8,7 @@ import { Response } from 'express';
 import { UserGooglePayload } from '@app/common';
 import { UserService } from 'src/user/user.service';
 import { RegisterDto } from './dto/register.dto';
-import { User } from '@prisma/client';
+import { $Enums, User } from '@prisma/client';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -33,16 +33,17 @@ export class AuthController {
   @UseGuards(GoogleOauthGuard)
   async googleAuthCallback(@Req() req, @Res() res: Response) {    
     const { email, name }: UserGooglePayload = req?.user;
-    const user = await this.userService.findUserByEmail(email);
+    let user = await this.userService.findUserByEmail(email);
     if (!user) {
       const registerData = new RegisterDto();
       registerData.email = email;
       registerData.name = name;
-      await this.authService.register(registerData);
+      registerData.auth_method = $Enums.AuthMethod.GOOGLE_OAUTH;
+      user = await this.authService.register(registerData);
     }
-    const validUser = await this.authService.validateUser(email);
-    const userLogin = await this.authService.login(user);
-    res.json({ ...validUser, ...userLogin }).status(200);
+    const token = await this.authService.getLoginToken(user);
+    delete user.password;
+    res.json({ ...user, ...token }).status(200);
   }
 
   @UseGuards(AuthGuard('local'))
@@ -52,12 +53,12 @@ export class AuthController {
     @Body() loginDto: LoginDto
   ) {
     const user: User = req?.user;
-    const token = await this.authService.login(user);
+    const token = await this.authService.getLoginToken(user);
     return { ...user, ...token };
   }
 
   @Post('local-register')
-  register(@Body() createAuthDto) {
-    // return this.authService.create(createAuthDto);
+  async register(@Body() registerDto: RegisterDto) {
+    return await this.authService.register(registerDto);
   }
 }

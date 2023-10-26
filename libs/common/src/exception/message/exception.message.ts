@@ -1,0 +1,3 @@
+export enum EXCEPTION_MESSAGE {
+  UNIQUE_CONSTRAINT = ''
+}

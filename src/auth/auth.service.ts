@@ -1,25 +1,23 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
-import { LoginDto } from './dto/login.dto';
 import { AuthMethod, User } from '@prisma/client';
 import { RegisterDto } from './dto/register.dto';
+import { JwtService, JwtSignOptions } from '@nestjs/jwt';
+import { AccessToken } from './type/access-token.type';
+import { RerfreshToken } from './type/refresh-token.type';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService
   ) { }
 
-  async validateUser(email: string, pass?: string): Promise<any> {
-    const user = await this.userService.findUserByEmail(email);
-    delete user.password;
-    if (user.auth_method === AuthMethod.GOOGLE_OAUTH) {
-      return user;
-    } else if (user && user.password === pass) {
-      return user;
-    }
+  async validateUser(email: string, pass: string): Promise<any> {
+    const { password, ...user } = await this.userService.findUserByEmail(email);
+    if (user) return user;
     return null;
   }
 
@@ -27,7 +25,17 @@ export class AuthService {
     return await this.userService.create(registerDto);
   }
 
-  async login(user: User) {
-    return { token: "abcdflkas adsfjd adsfjadsf askdfj ad" };
+  async getLoginToken({ id, email }: Partial<User>) {
+    const accessTokenPayload: AccessToken = { id, email, scope: 'ACCESS TOKEN' };
+    const refreshTokenPayload: RerfreshToken = { id, email, scope: 'REFRESH TOKEN' };
+
+    const accessToken = await this.jwtService.signAsync(
+      accessTokenPayload
+    );
+    const refrsehToken = await this.jwtService.signAsync(
+      refreshTokenPayload, { expiresIn: '3h' }
+    );
+
+    return { accessToken, refrsehToken };
   }
 }
