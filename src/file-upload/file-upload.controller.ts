@@ -48,43 +48,5 @@ export class FileUploadController {
       availableBucket: FILE_DESTINATION
     });
   }
-
-  @ApiOperation({
-    description: `
-      Used for client to upload file, required bucket (string) as destination of file.
-      Available bucket: ${availableFileDestionation()}
-    `
-  })
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        }
-      },
-    },
-  })
-  @Post('upload file gajelas/:bucket')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadFiles(
-    @Param('bucket') bucket: FILE_DESTINATION,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    for (const key in FILE_DESTINATION) {
-      if (FILE_DESTINATION[key] === bucket) {
-        return await this.fileUploadService.saveFile(
-          bucket as FILE_DESTINATION, file
-        );
-      }
-    }
-    
-    throw new BadRequestException({
-      msg: BAD_REQ_EXC_MSG.INVALID_FILE_DESTINATION,
-      availableBucket: FILE_DESTINATION
-    });
-  }
 }
 
