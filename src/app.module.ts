@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseInterceptor } from '@app/common/interceptor/response.interceptor';
+import { FileUploadModule } from './file-upload/file-upload.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ResponseInterceptor } from '@app/common/interceptor/response.intercepto
     }),
     AuthModule,
     UserModule,
+    FileUploadModule,
   ],
   controllers: [AppController],
   providers: [
