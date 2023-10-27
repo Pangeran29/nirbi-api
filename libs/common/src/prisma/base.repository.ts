@@ -1,6 +1,5 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import { FindManyRecordDto } from '../dto';
-import { RecordNotFoundException } from '../exception/prisma/record-not-found.exception';
 import { RecordNotCreatedException } from '../exception/prisma/record-not-created.exception';
 
 export abstract class BaseRepository<T> {
