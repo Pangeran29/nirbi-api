@@ -32,7 +32,7 @@ export function SwaggerBuildFactory(app: INestApplication) {
   );
 
   const customOptions: SwaggerCustomOptions = {
-    customSiteTitle: `${appName} API Docs`,
+    customSiteTitle: `${appName} API Documentation`,
     swaggerOptions: {
       tagsSorter: 'alpha',
       operationsSorter: 'alpha',
