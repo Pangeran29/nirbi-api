@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { LoginDto } from './dto/login.dto';
 import { GoogleOauthGuard } from '@app/common/guard/google-oauth.guard';
@@ -10,6 +10,7 @@ import { UserService } from 'src/user/user.service';
 import { RegisterDto } from './dto/register.dto';
 import { $Enums, User } from '@prisma/client';
 
+@ApiBearerAuth()
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -31,7 +32,7 @@ export class AuthController {
   })
   @Get('google/callback')
   @UseGuards(GoogleOauthGuard)
-  async googleAuthCallback(@Req() req, @Res() res: Response) {    
+  async googleAuthCallback(@Req() req, @Res() res: Response) {
     const { email, name }: UserGooglePayload = req?.user;
     let user = await this.userService.findUserByEmail(email);
     if (!user) {
