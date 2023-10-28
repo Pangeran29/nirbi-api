@@ -6,9 +6,12 @@ import { FileSystemService } from '@app/helper';
 export class FileUploadService {
   private readonly _fileDestination = FILE_DESTINATION;
 
-  constructor(private readonly fileSystemService: FileSystemService) { }
+  constructor(private readonly fileSystemService: FileSystemService) {}
 
-  async saveFile(bucket: FILE_DESTINATION, { originalname, buffer, ...data }: Express.Multer.File) {
+  async saveFile(
+    bucket: FILE_DESTINATION,
+    { originalname, buffer, ...data }: Express.Multer.File,
+  ) {
     return await this.fileSystemService.saveFile(bucket, originalname, buffer);
   }
 }

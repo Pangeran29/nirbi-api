@@ -30,7 +30,7 @@ export abstract class BaseRepository<T> {
     return await this.prisma[this.model].upsert({
       where: { id },
       create,
-      update
+      update,
     });
   }
 
@@ -43,7 +43,7 @@ export abstract class BaseRepository<T> {
 
   async findUnique(uniqueFieldName: string, value: string): Promise<T | null> {
     const record = await this.prisma[this.model].findUnique({
-      where: { [uniqueFieldName]: value }
+      where: { [uniqueFieldName]: value },
     });
     // if (!record) {
     //   throw new RecordNotFoundException();
@@ -59,9 +59,8 @@ export abstract class BaseRepository<T> {
     findManyRecordDto: FindManyRecordDto,
     whereQuery: any,
   ): Promise<T[] | any> {
-    const {
-      skip, take, sort, createdAtStartDate, createdAtEndDate
-    } = findManyRecordDto;
+    const { skip, take, sort, createdAtStartDate, createdAtEndDate } =
+      findManyRecordDto;
 
     const data = await this.prisma[this.model].findMany({
       take,

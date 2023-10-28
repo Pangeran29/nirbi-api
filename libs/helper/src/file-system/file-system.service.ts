@@ -4,7 +4,11 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
 @Injectable()
 export class FileSystemService {
-  async saveFile(destination: any, fileName: any, data: any): Promise<{ filePath: string }> {
+  async saveFile(
+    destination: any,
+    fileName: any,
+    data: any,
+  ): Promise<{ filePath: string }> {
     const directory = `storage/file/${destination}`;
     const isDirectoryExist = await this.checkPathExist(directory);
     if (!isDirectoryExist) {
@@ -19,7 +23,6 @@ export class FileSystemService {
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
-
   }
 
   async deleteFile(filePath: string): Promise<boolean> {

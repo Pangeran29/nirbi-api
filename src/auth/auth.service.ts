@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
-import { AuthMethod, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { RegisterDto } from './dto/register.dto';
-import { JwtService, JwtSignOptions } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 import { AccessToken } from './type/access-token.type';
 import { RerfreshToken } from './type/refresh-token.type';
 
@@ -12,8 +12,8 @@ export class AuthService {
 
   constructor(
     private readonly userService: UserService,
-    private readonly jwtService: JwtService
-  ) { }
+    private readonly jwtService: JwtService,
+  ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
     const { password, ...user } = await this.userService.findUserByEmail(email);
@@ -26,15 +26,21 @@ export class AuthService {
   }
 
   async getLoginToken({ id, email }: Partial<User>) {
-    const accessTokenPayload: AccessToken = { id, email, scope: 'ACCESS TOKEN' };
-    const refreshTokenPayload: RerfreshToken = { id, email, scope: 'REFRESH TOKEN' };
+    const accessTokenPayload: AccessToken = {
+      id,
+      email,
+      scope: 'ACCESS TOKEN',
+    };
+    const refreshTokenPayload: RerfreshToken = {
+      id,
+      email,
+      scope: 'REFRESH TOKEN',
+    };
 
-    const accessToken = await this.jwtService.signAsync(
-      accessTokenPayload
-    );
-    const refrsehToken = await this.jwtService.signAsync(
-      refreshTokenPayload, { expiresIn: '3h' }
-    );
+    const accessToken = await this.jwtService.signAsync(accessTokenPayload);
+    const refrsehToken = await this.jwtService.signAsync(refreshTokenPayload, {
+      expiresIn: '3h',
+    });
 
     return { accessToken, refrsehToken };
   }

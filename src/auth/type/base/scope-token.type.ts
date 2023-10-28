@@ -1,1 +1,1 @@
-export type ScopeToken = 'ACCESS TOKEN' | 'REFRESH TOKEN'
+export type ScopeToken = 'ACCESS TOKEN' | 'REFRESH TOKEN';

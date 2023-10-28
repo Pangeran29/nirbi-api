@@ -1,6 +1,6 @@
-import { BaseToken } from "./base/base-token.type"
+import { BaseToken } from './base/base-token.type';
 
 export type AccessToken = BaseToken & {
-  id: number,
-  email: string
-}
+  id: number;
+  email: string;
+};

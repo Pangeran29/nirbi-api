@@ -1,4 +1,4 @@
-import { $Enums, User } from "@prisma/client";
+import { $Enums, User } from '@prisma/client';
 
 export class CreateUserDto implements User {
   id: number;

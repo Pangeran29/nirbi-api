@@ -1,7 +1,4 @@
-import pino from 'pino';
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
 
 @Module({
   imports: [
@@ -15,7 +12,6 @@ import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
     //     const month = today.getUTCMonth();
     //     const year = today.getUTCFullYear();
     //     const logName = `${date}-${month}-${year}`;
-
     //     return {
     //       pinoHttp: {
     //         level: 'info',

@@ -1,4 +1,4 @@
-import { Logger, NotFoundException } from "@nestjs/common";
+import { Logger, NotFoundException } from '@nestjs/common';
 
 export class RecordNotFoundException extends NotFoundException {
   private readonly logger = new Logger(RecordNotFoundException.name);

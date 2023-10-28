@@ -1,7 +1,5 @@
-import { ScopeToken } from "./scope-token.type"
+import { ScopeToken } from './scope-token.type';
 
-export type BaseToken = { 
-  scope: ScopeToken
-}
-
-
+export type BaseToken = {
+  scope: ScopeToken;
+};

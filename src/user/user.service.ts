@@ -8,9 +8,7 @@ export type User = any;
 
 @Injectable()
 export class UserService {
-  constructor(
-    private readonly userRepository: UserRepository
-  ) { }
+  constructor(private readonly userRepository: UserRepository) {}
 
   private readonly users = [
     {
@@ -38,7 +36,7 @@ export class UserService {
   }
 
   async findOne(username: string): Promise<User | undefined> {
-    return this.users.find(user => user.username === username);
+    return this.users.find((user) => user.username === username);
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

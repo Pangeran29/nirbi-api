@@ -1,6 +1,13 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { $Enums, User } from "@prisma/client";
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, IsStrongPassword } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { $Enums, User } from '@prisma/client';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsStrongPassword,
+} from 'class-validator';
 
 export class RegisterDto implements Partial<User> {
   @IsEmail()
@@ -17,7 +24,7 @@ export class RegisterDto implements Partial<User> {
 
   @ApiProperty({
     description: 'Login identifier, local auth by default',
-    enum: $Enums.AuthMethod
+    enum: $Enums.AuthMethod,
   })
   @IsOptional()
   @IsEnum($Enums.AuthMethod)

@@ -6,8 +6,8 @@ import { SwaggerBuildFactory } from '@app/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
-  
-  // enable cors 
+
+  // enable cors
   app.enableCors();
 
   // set default logger using pino

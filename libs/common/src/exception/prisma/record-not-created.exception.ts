@@ -1,4 +1,4 @@
-import { ConflictException, Logger } from "@nestjs/common";
+import { ConflictException, Logger } from '@nestjs/common';
 
 export class RecordNotCreatedException extends ConflictException {
   private readonly logger = new Logger(RecordNotCreatedException.name);

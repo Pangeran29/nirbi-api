@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  UseGuards,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
@@ -17,18 +25,19 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UserService,
-  ) { }
+  ) {}
 
   @ApiOperation({
-    description: "Used in client side to redirect to Google Oauth"
+    description: 'Used in client side to redirect to Google Oauth',
   })
   @Get('google')
   @UseGuards(GoogleOauthGuard)
-  async auth() { }
+  async auth() {}
 
   @ApiOperation({
     deprecated: true,
-    description: "This Api only used in backend side (no need to implement in client side)"
+    description:
+      'This Api only used in backend side (no need to implement in client side)',
   })
   @Get('google/callback')
   @UseGuards(GoogleOauthGuard)
@@ -49,10 +58,7 @@ export class AuthController {
 
   @UseGuards(AuthGuard('local'))
   @Post('local-login')
-  async login(
-    @Req() req,
-    @Body() loginDto: LoginDto
-  ) {
+  async login(@Req() req, @Body() loginDto: LoginDto) {
     const user: User = req?.user;
     const token = await this.authService.getLoginToken(user);
     return { ...user, ...token };

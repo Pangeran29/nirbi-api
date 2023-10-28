@@ -6,6 +6,6 @@ import { FileSystemModule } from '@app/helper';
 @Module({
   controllers: [FileUploadController],
   providers: [FileUploadService],
-  imports: [FileSystemModule]
+  imports: [FileSystemModule],
 })
 export class FileUploadModule {}

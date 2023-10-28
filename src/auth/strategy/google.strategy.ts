@@ -6,13 +6,11 @@ import { Strategy, VerifyCallback } from 'passport-google-oauth2';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
-  constructor(
-    private readonly configService: ConfigService
-  ) {
+  constructor(private readonly configService: ConfigService) {
     super({
       clientID: configService.get('CLIENT_ID'),
-      clientSecret: configService.get("CLIENT_SECRET"),
-      callbackURL: configService.get("CALL_BACK_URL"),
+      clientSecret: configService.get('CLIENT_SECRET'),
+      callbackURL: configService.get('CALL_BACK_URL'),
       scope: ['profile', 'email'],
     });
   }
@@ -22,7 +20,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     _refreshToken: string,
     profile: any,
     done: VerifyCallback,
-  ): Promise<any> {    
+  ): Promise<any> {
     const { id, name, emails, photos } = profile;
     const user: UserGooglePayload = {
       provider: 'google',
