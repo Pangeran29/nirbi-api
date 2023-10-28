@@ -8,6 +8,8 @@ import { UserModule } from './user/user.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseInterceptor } from '@app/common/interceptor/response.interceptor';
 import { FileUploadModule } from './file-upload/file-upload.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -21,6 +23,9 @@ import { FileUploadModule } from './file-upload/file-upload.module';
         PREFIX_NAME: Joi.string().required(),
         JWT_EXPIRATION: Joi.string().required(),
       }),
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '')
     }),
     AuthModule,
     UserModule,

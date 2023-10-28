@@ -5,6 +5,8 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  Get,
+  Res,
 } from '@nestjs/common';
 import { FileUploadService } from './file-upload.service';
 import {
@@ -20,6 +22,8 @@ import {
   availableFileDestionation,
 } from './constant/file-destination.constant';
 import { BAD_REQ_EXC_MSG } from '@app/common/exception/message';
+import { join } from 'path';
+import { Response } from 'express';
 
 @ApiBearerAuth()
 @ApiTags('file-upload')
@@ -64,5 +68,15 @@ export class FileUploadController {
       msg: BAD_REQ_EXC_MSG.INVALID_FILE_DESTINATION,
       availableBucket: FILE_DESTINATION,
     });
+  }
+
+  @ApiOperation({
+    description: `Get available public file`,
+  })
+  @Get('/storage/:filename')
+  async serveFile(@Param('filename') filename: string, @Res() res: Response): Promise<void> {
+    const file = join(__dirname, '..', '../../', filename);
+    console.log(file)
+    res.sendFile(file, );
   }
 }
