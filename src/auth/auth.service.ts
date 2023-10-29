@@ -3,8 +3,8 @@ import { UserService } from 'src/user/user.service';
 import { User } from '@prisma/client';
 import { RegisterDto } from './dto/register.dto';
 import { JwtService } from '@nestjs/jwt';
-import { AccessToken } from './type/access-token.type';
-import { RerfreshToken } from './type/refresh-token.type';
+import { UserAccessToken } from './type/user-access-token.type';
+import { UserRerfreshToken } from './type/user-refresh-token.type';
 
 @Injectable()
 export class AuthService {
@@ -26,13 +26,13 @@ export class AuthService {
   }
 
   async getLoginToken({ id, email }: Partial<User>) {
-    const accessTokenPayload: AccessToken = {
-      id,
+    const accessTokenPayload: UserAccessToken = {
+      sub: id,
       email,
       scope: 'ACCESS TOKEN',
     };
-    const refreshTokenPayload: RerfreshToken = {
-      id,
+    const refreshTokenPayload: UserRerfreshToken = {
+      sub: id,
       email,
       scope: 'REFRESH TOKEN',
     };

@@ -24,9 +24,9 @@ export class RegisterDto implements Partial<User> {
 
   @ApiProperty({
     description: 'Login identifier, local auth by default',
-    enum: $Enums.AuthMethod,
+    enum: $Enums.AUTH_METHOD,
   })
   @IsOptional()
-  @IsEnum($Enums.AuthMethod)
-  auth_method?: $Enums.AuthMethod = $Enums.AuthMethod.LOCAL_AUTH;
+  @IsEnum($Enums.AUTH_METHOD)
+  auth_method?: $Enums.AUTH_METHOD = $Enums.AUTH_METHOD.LOCAL_AUTH;
 }

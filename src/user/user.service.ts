@@ -8,7 +8,7 @@ export type User = any;
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(private readonly userRepository: UserRepository) { }
 
   private readonly users = [
     {
@@ -24,7 +24,9 @@ export class UserService {
   ];
 
   async findUserByEmail(email: string) {
-    return await this.userRepository.findUnique('email', email);
+    return await this.userRepository.findUnique({
+      uniqueField: 'email', uniqueFieldValue: email
+    });
   }
 
   async create(createUserDto: CreateUserDto | RegisterDto) {

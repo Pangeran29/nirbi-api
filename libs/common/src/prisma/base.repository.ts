@@ -1,6 +1,8 @@
 import { Prisma, PrismaClient } from '@prisma/client';
-import { FindManyRecordDto } from '../dto';
 import { RecordNotCreatedException } from '../exception/prisma/record-not-created.exception';
+import { IncludeArgs } from './types/include.type';
+import { FindUniqueDto } from './dto/find-unique.dto';
+import { FindManyDto } from './dto/find-many.dto';
 
 export abstract class BaseRepository<T> {
   protected prisma: PrismaClient;
@@ -41,14 +43,11 @@ export abstract class BaseRepository<T> {
     return deleteRecord;
   }
 
-  async findUnique(uniqueFieldName: string, value: string): Promise<T | null> {
-    const record = await this.prisma[this.model].findUnique({
-      where: { [uniqueFieldName]: value },
+  async findUnique({ uniqueField, uniqueFieldValue, include }: FindUniqueDto): Promise<T | null> {
+    return await this.prisma[this.model].findUnique({
+      where: { [uniqueField]: uniqueFieldValue },
+      include
     });
-    // if (!record) {
-    //   throw new RecordNotFoundException();
-    // }
-    return record;
   }
 
   async count(): Promise<number> {
@@ -56,35 +55,22 @@ export abstract class BaseRepository<T> {
   }
 
   async findMany(
-    findManyRecordDto: FindManyRecordDto,
-    whereQuery: any,
+    { baseQueryFindManyDto, include, where }: FindManyDto
   ): Promise<T[] | any> {
-    const { skip, take, sort, createdAtStartDate, createdAtEndDate } =
-      findManyRecordDto;
+    const { skip, take, sort } = baseQueryFindManyDto;
 
     const data = await this.prisma[this.model].findMany({
       take,
       skip,
-      where: {
-        ...whereQuery,
-        createdAt: {
-          gte: createdAtStartDate,
-          lt: createdAtEndDate,
-        },
-      },
+      where,
+      include,
       orderBy: {
         createdAt: sort,
       },
     });
 
     const totalData = await this.prisma[this.model].count({
-      where: {
-        ...whereQuery,
-        createdAt: {
-          gte: createdAtStartDate,
-          lt: createdAtEndDate,
-        },
-      },
+      where
     });
 
     return { totalData, [this.model]: data };

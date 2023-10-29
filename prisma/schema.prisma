@@ -11,16 +11,38 @@ datasource db {
 }
 
 model User {
-  id          Int         @unique @default(autoincrement())
-  email       String?     @unique
+  id          Int          @unique @default(autoincrement())
+  email       String?      @unique
   name        String?
   password    String?
-  auth_method AuthMethod?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  auth_method AUTH_METHOD?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Status Status[]
 }
 
-enum AuthMethod {
+model Status {
+  id              Int             @unique @default(autoincrement())
+  type_of_content TYPE_OF_CONTENT
+  description     String?         @db.Text
+  media           String?
+
+  User    User @relation(references: [id], fields: [user_id])
+  user_id Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum AUTH_METHOD {
   GOOGLE_OAUTH
   LOCAL_AUTH
+}
+
+enum TYPE_OF_CONTENT {
+  TEXT
+  PICTURE
+  VIDEO
 }

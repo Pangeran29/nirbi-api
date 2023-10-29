@@ -10,6 +10,8 @@ import { ResponseInterceptor } from '@app/common/interceptor/response.intercepto
 import { FileUploadModule } from './file-upload/file-upload.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { StatusModule } from './status/status.module';
+import { PrismaModule } from '@app/common/prisma/prisma.module';
 
 @Module({
   imports: [
@@ -28,8 +30,10 @@ import { join } from 'path';
       rootPath: join(__dirname, '..', '')
     }),
     AuthModule,
+    PrismaModule,
     UserModule,
     FileUploadModule,
+    StatusModule,
   ],
   controllers: [AppController],
   providers: [
