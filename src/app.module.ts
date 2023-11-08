@@ -12,6 +12,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { StatusModule } from './status/status.module';
 import { PrismaModule } from '@app/common/prisma/prisma.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { PrismaModule } from '@app/common/prisma/prisma.module';
     UserModule,
     FileUploadModule,
     StatusModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [

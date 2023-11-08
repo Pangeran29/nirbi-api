@@ -6,17 +6,7 @@ import { SwaggerBuildFactory } from '@app/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
-
-  // enable cors
   app.enableCors();
-
-  // set default logger using pino
-  const logger = new Logger('NestApplication');
-
-  // get configuration file
-  const configService = app.get(ConfigService);
-
-  // set global validation pipes
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -28,9 +18,10 @@ async function bootstrap() {
     }),
   );
 
-  // build swagger
   SwaggerBuildFactory(app);
-
+  
+  const logger = new Logger('NestApplication');
+  const configService = app.get(ConfigService);
   await app.listen(configService.getOrThrow('PORT'), async () => {
     const prefix = configService.getOrThrow('PREFIX_NAME');
     logger.warn(`Swagger is running on: ${await app.getUrl()}/${prefix}/docs`);

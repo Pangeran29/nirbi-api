@@ -5,6 +5,7 @@ import { RegisterDto } from './dto/register.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserAccessToken } from './type/user-access-token.type';
 import { UserRerfreshToken } from './type/user-refresh-token.type';
+import { ExtractJWT } from './type/extract-jwt.type';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +14,24 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
+
+  async extractJWTAccessToken(jwt: string): Promise<ExtractJWT> {
+    let payload: ExtractJWT;
+    try {
+      const userMetadata = await this.jwtService.verifyAsync(jwt);
+      payload = { 
+        isSuccess: true, 
+        currentUserMetadata: userMetadata 
+      };
+    } catch (error) {
+      payload = { 
+        isSuccess: false, 
+        error: error?.message 
+      };
+    }
+    return payload;
+  }
 
   async validateUser(email: string, pass: string): Promise<any> {
     const { password, ...user } = await this.userService.findUserByEmail(email);
