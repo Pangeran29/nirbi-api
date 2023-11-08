@@ -7,7 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { ChatService } from './chat.service';
 import { Server, Socket } from 'socket.io';
-import { HttpStatus, OnModuleInit, ValidationPipe } from '@nestjs/common';
+import { HttpStatus, Logger, OnModuleInit, ValidationPipe } from '@nestjs/common';
 import { SOCKET_EVENT } from './enum/socket-event.enum';
 import { SendMessageDto } from './dto/send-message.dto';
 import { ToJsonPipe } from '../../libs/common/src/pipe/to-json.pipe';
@@ -18,11 +18,12 @@ import { UserAccessToken } from 'src/auth/type/user-access-token.type';
 import { ExtractJWT } from 'src/auth/type/extract-jwt.type';
 
 @WebSocketGateway(3001, { namespace: 'chat' })
-export class ChatGateway implements OnModuleInit {
+export class ChatGateway implements OnModuleInit {  
   @WebSocketServer()
   server: Server;
-
+  
   private connectedUsers: Map<number, Socket> = new Map();
+  private readonly logger = new Logger(ChatGateway.name);
 
   constructor(
     private readonly chatService: ChatService,
@@ -34,6 +35,7 @@ export class ChatGateway implements OnModuleInit {
    */
   onModuleInit() {
     this.server.on('connection', async (socket: Socket) => {
+      this.logger.debug(socket);
       const bearerToken = socket['handshake']['headers']['authorization'];
       if (bearerToken) {
         const accessToken = bearerToken.split(' ')[1];
