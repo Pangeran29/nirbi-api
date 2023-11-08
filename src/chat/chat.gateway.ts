@@ -1,7 +1,5 @@
 import { WebSocketGateway, SubscribeMessage, MessageBody, WebSocketServer, ConnectedSocket } from '@nestjs/websockets';
 import { ChatService } from './chat.service';
-import { CreateChatDto } from './dto/create-chat.dto';
-import { UpdateChatDto } from './dto/update-chat.dto';
 import { Server, Socket } from 'socket.io';
 import { HttpStatus, OnModuleInit, ValidationPipe } from '@nestjs/common';
 import { SOCKET_EVENT } from './enum/socket-event.enum';
