@@ -17,25 +17,25 @@ import { AuthService } from 'src/auth/auth.service';
 import { UserAccessToken } from 'src/auth/type/user-access-token.type';
 import { ExtractJWT } from 'src/auth/type/extract-jwt.type';
 
-@WebSocketGateway(3001, { namespace: 'chat' })
-export class ChatGateway implements OnModuleInit {  
+@WebSocketGateway({ namespace: 'chat' })
+export class ChatGateway implements OnModuleInit {
   @WebSocketServer()
   server: Server;
-  
+
   private connectedUsers: Map<number, Socket> = new Map();
   private readonly logger = new Logger(ChatGateway.name);
 
   constructor(
     private readonly chatService: ChatService,
     private readonly authService: AuthService,
-  ) {}
+  ) { }
 
   /**
    * Manage socket everytime connection establish
    */
   onModuleInit() {
     this.server.on('connection', async (socket: Socket) => {
-      this.logger.debug(socket);
+      this.logger.debug(`a new connection with socker id ${socket.id}`);
       const bearerToken = socket['handshake']['headers']['authorization'];
       if (bearerToken) {
         const accessToken = bearerToken.split(' ')[1];
