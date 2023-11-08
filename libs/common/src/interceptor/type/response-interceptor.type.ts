@@ -1,4 +1,4 @@
 export type ResponseInterceptorType = {
-  message: any,
-  data: any
-}
+  message: any;
+  data: any;
+};

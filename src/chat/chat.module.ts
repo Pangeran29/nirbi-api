@@ -5,6 +5,6 @@ import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   providers: [ChatGateway, ChatService],
-  imports: [AuthModule]
+  imports: [AuthModule],
 })
 export class ChatModule {}

@@ -1,6 +1,5 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import { RecordNotCreatedException } from '../exception/prisma/record-not-created.exception';
-import { IncludeArgs } from './types/include.type';
 import { FindUniqueDto } from './dto/find-unique.dto';
 import { FindManyDto } from './dto/find-many.dto';
 
@@ -43,10 +42,14 @@ export abstract class BaseRepository<T> {
     return deleteRecord;
   }
 
-  async findUnique({ uniqueField, uniqueFieldValue, include }: FindUniqueDto): Promise<T | null> {
+  async findUnique({
+    uniqueField,
+    uniqueFieldValue,
+    include,
+  }: FindUniqueDto): Promise<T | null> {
     return await this.prisma[this.model].findUnique({
       where: { [uniqueField]: uniqueFieldValue },
-      include
+      include,
     });
   }
 
@@ -54,9 +57,11 @@ export abstract class BaseRepository<T> {
     return await this.prisma[this.model].count();
   }
 
-  async findMany(
-    { baseQueryFindManyDto, include, where }: FindManyDto
-  ): Promise<T[] | any> {
+  async findMany({
+    baseQueryFindManyDto,
+    include,
+    where,
+  }: FindManyDto): Promise<T[] | any> {
     const { skip, take, sort } = baseQueryFindManyDto;
 
     const data = await this.prisma[this.model].findMany({
@@ -70,7 +75,7 @@ export abstract class BaseRepository<T> {
     });
 
     const totalData = await this.prisma[this.model].count({
-      where
+      where,
     });
 
     return { totalData, [this.model]: data };

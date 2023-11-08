@@ -28,7 +28,7 @@ import { ChatModule } from './chat/chat.module';
       }),
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '')
+      rootPath: join(__dirname, '..', ''),
     }),
     AuthModule,
     PrismaModule,

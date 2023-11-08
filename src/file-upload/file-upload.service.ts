@@ -10,7 +10,7 @@ export class FileUploadService {
 
   async saveFile(
     bucket: FILE_DESTINATION,
-    { originalname, buffer, ...data }: Express.Multer.File,
+    { originalname, buffer }: Express.Multer.File,
   ) {
     return await this.fileSystemService.saveFile(bucket, originalname, buffer);
   }

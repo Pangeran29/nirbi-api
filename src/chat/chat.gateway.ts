@@ -1,4 +1,10 @@
-import { WebSocketGateway, SubscribeMessage, MessageBody, WebSocketServer, ConnectedSocket } from '@nestjs/websockets';
+import {
+  WebSocketGateway,
+  SubscribeMessage,
+  MessageBody,
+  WebSocketServer,
+  ConnectedSocket,
+} from '@nestjs/websockets';
 import { ChatService } from './chat.service';
 import { Server, Socket } from 'socket.io';
 import { HttpStatus, OnModuleInit, ValidationPipe } from '@nestjs/common';
@@ -20,15 +26,15 @@ export class ChatGateway implements OnModuleInit {
 
   constructor(
     private readonly chatService: ChatService,
-    private readonly authService: AuthService
-  ) { }
+    private readonly authService: AuthService,
+  ) {}
 
   /**
    * Manage socket everytime connection establish
    */
   onModuleInit() {
     this.server.on('connection', async (socket: Socket) => {
-      const bearerToken = socket['handshake']['headers']['authorization']
+      const bearerToken = socket['handshake']['headers']['authorization'];
       if (bearerToken) {
         const accessToken = bearerToken.split(' ')[1];
         const currentUser = await this._handleAccessToken(accessToken, socket);
@@ -48,8 +54,8 @@ export class ChatGateway implements OnModuleInit {
     const error: WebSocketError = {
       success: false,
       statusCode: HttpStatus.FORBIDDEN,
-      message: FORBIDDEN_EXC_MSG.INVALID_JWT
-    }
+      message: FORBIDDEN_EXC_MSG.INVALID_JWT,
+    };
     socket.emit(SOCKET_EVENT.EXCEPTION, error);
     socket.disconnect(true);
   }
@@ -61,10 +67,12 @@ export class ChatGateway implements OnModuleInit {
    * @returns void | UserAccessToken
    * @type void | UserAccessToken
    */
-  private async _handleAccessToken(accessToken: string, socket: Socket): Promise<UserAccessToken | void> {
-    const { isSuccess, currentUserMetadata }: ExtractJWT = await this
-      .authService
-      .extractJWTAccessToken(accessToken);
+  private async _handleAccessToken(
+    accessToken: string,
+    socket: Socket,
+  ): Promise<UserAccessToken | void> {
+    const { isSuccess, currentUserMetadata }: ExtractJWT =
+      await this.authService.extractJWTAccessToken(accessToken);
     if (!isSuccess) {
       return this._handleInvalidJWT(socket);
     }
@@ -75,25 +83,24 @@ export class ChatGateway implements OnModuleInit {
    * Sending message between two client
    * @param client Current user socket instance
    * @param param1 send message dto
-   * @todo emit error for dto exception, save chat funcionality, integrating with redis 
+   * @todo emit error for dto exception, save chat funcionality, integrating with redis
    */
   @SubscribeMessage(SOCKET_EVENT.SEND_MESSAGE)
   async onNewMessage(
     @ConnectedSocket()
     client: Socket,
     @MessageBody(new ToJsonPipe(), new ValidationPipe())
-    { receiverId, message }: SendMessageDto
+    { receiverId, message }: SendMessageDto,
   ) {
     const sender = client['CurrentUser'];
     const receiverClient = this.connectedUsers.get(receiverId);
     receiverClient.emit(SOCKET_EVENT.ON_SEND_MESSAGE, {
       message,
-      from: sender
+      from: sender,
     });
     client.emit(SOCKET_EVENT.ON_SEND_MESSAGE, {
       message,
-      from: 'self'
+      from: 'self',
     });
   }
-
 }

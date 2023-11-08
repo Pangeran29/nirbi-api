@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, BadRequestException, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { StatusService } from './status.service';
 import { CreateStatusDto } from './dto/create-status.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
@@ -18,14 +28,14 @@ import { FindManyStatusDto } from './dto/find-many-status.dto';
 export class StatusController {
   constructor(
     private readonly statusService: StatusService,
-    private readonly fileSystemService: FileSystemService
-  ) { }
+    private readonly fileSystemService: FileSystemService,
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @Post()
   async create(
     @CurrentUser() { sub }: UserAccessToken,
-    @Body() createStatusDto: CreateStatusDto
+    @Body() createStatusDto: CreateStatusDto,
   ) {
     const { media } = createStatusDto;
     const isMediaExist = await this.fileSystemService.checkPathExist(media);
@@ -48,7 +58,7 @@ export class StatusController {
   @Patch(':id')
   async update(
     @Param('id') id: string,
-    @Body() updateStatusDto: UpdateStatusDto
+    @Body() updateStatusDto: UpdateStatusDto,
   ) {
     const { media } = updateStatusDto;
     if (media) {

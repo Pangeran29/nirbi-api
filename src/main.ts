@@ -19,7 +19,7 @@ async function bootstrap() {
   );
 
   SwaggerBuildFactory(app);
-  
+
   const logger = new Logger('NestApplication');
   const configService = app.get(ConfigService);
   await app.listen(configService.getOrThrow('PORT'), async () => {

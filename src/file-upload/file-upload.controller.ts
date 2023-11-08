@@ -74,9 +74,12 @@ export class FileUploadController {
     description: `Get available public file`,
   })
   @Get('/storage/:filename')
-  async serveFile(@Param('filename') filename: string, @Res() res: Response): Promise<void> {
+  async serveFile(
+    @Param('filename') filename: string,
+    @Res() res: Response,
+  ): Promise<void> {
     const file = join(__dirname, '..', '../../', filename);
-    console.log(file)
-    res.sendFile(file, );
+    console.log(file);
+    res.sendFile(file);
   }
 }

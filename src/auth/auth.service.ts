@@ -14,26 +14,26 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   async extractJWTAccessToken(jwt: string): Promise<ExtractJWT> {
     let payload: ExtractJWT;
     try {
       const userMetadata = await this.jwtService.verifyAsync(jwt);
-      payload = { 
-        isSuccess: true, 
-        currentUserMetadata: userMetadata 
+      payload = {
+        isSuccess: true,
+        currentUserMetadata: userMetadata,
       };
     } catch (error) {
-      payload = { 
-        isSuccess: false, 
-        error: error?.message 
+      payload = {
+        isSuccess: false,
+        error: error?.message,
       };
     }
     return payload;
   }
 
-  async validateUser(email: string, pass: string): Promise<any> {
+  async validateUser(email: string): Promise<any> {
     const { password, ...user } = await this.userService.findUserByEmail(email);
     if (user) return user;
     return null;
