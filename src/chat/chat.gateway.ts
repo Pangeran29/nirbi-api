@@ -35,16 +35,20 @@ export class ChatGateway implements OnModuleInit {
    */
   onModuleInit() {
     this.server.on('connection', async (socket: Socket) => {
-      this.logger.debug(`a new connection with socker id ${socket.id}`);
       const bearerToken = socket['handshake']['headers']['authorization'];
       if (bearerToken) {
         const accessToken = bearerToken.split(' ')[1];
-        const currentUser = await this._handleAccessToken(accessToken, socket);
-        socket['CurrentUser'] = currentUser;
-        this.connectedUsers.set(currentUser['sub'], socket);
+        const { isSuccess, currentUserMetadata }: ExtractJWT =
+        await this.authService.extractJWTAccessToken(accessToken);
+        if (!isSuccess) {
+          return this._handleInvalidJWT(socket);
+        }
+        socket['CurrentUser'] = currentUserMetadata;
+        this.connectedUsers.set(currentUserMetadata['sub'], socket);
       } else {
         this._handleInvalidJWT(socket);
       }
+      this.logger.debug(`a new connection with socker id ${socket.id}`);
     });
   }
 
@@ -72,13 +76,13 @@ export class ChatGateway implements OnModuleInit {
   private async _handleAccessToken(
     accessToken: string,
     socket: Socket,
-  ): Promise<UserAccessToken | void> {
+  ): Promise<ExtractJWT | void> {
     const { isSuccess, currentUserMetadata }: ExtractJWT =
       await this.authService.extractJWTAccessToken(accessToken);
     if (!isSuccess) {
       return this._handleInvalidJWT(socket);
     }
-    return currentUserMetadata;
+    return { isSuccess, currentUserMetadata };
   }
 
   /**
