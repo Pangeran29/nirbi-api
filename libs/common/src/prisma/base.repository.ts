@@ -2,6 +2,7 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import { RecordNotCreatedException } from '../exception/prisma/record-not-created.exception';
 import { FindUniqueDto } from './dto/find-unique.dto';
 import { FindManyDto } from './dto/find-many.dto';
+import { RecordNotDeletedException, RecordNotUpdatedException } from '../exception/prisma';
 
 export abstract class BaseRepository<T> {
   protected prisma: PrismaClient;
@@ -21,25 +22,24 @@ export abstract class BaseRepository<T> {
   }
 
   async update(id: number, data: Partial<T>): Promise<T> {
-    return await this.prisma[this.model].update({
-      where: { id },
-      data,
-    });
+    try {
+      return await this.prisma[this.model].update({
+        where: { id },
+        data,
+      });
+    } catch (error) {
+      throw new RecordNotUpdatedException(error);
+    }
   }
 
-  async upsert(id: number, create: Partial<T>, update: Partial<T>) {
-    return await this.prisma[this.model].upsert({
-      where: { id },
-      create,
-      update,
-    });
-  }
-
-  async deleteById(id: number): Promise<boolean> {
-    const deleteRecord = await this.prisma[this.model].delete({
-      where: { id },
-    });
-    return deleteRecord;
+  async deleteById(id: number): Promise<T> {
+    try {
+      return await this.prisma[this.model].delete({
+        where: { id },
+      });
+    } catch (error) {
+      throw new RecordNotDeletedException(error)
+    }
   }
 
   async findUnique({
@@ -50,6 +50,12 @@ export abstract class BaseRepository<T> {
     return await this.prisma[this.model].findUnique({
       where: { [uniqueField]: uniqueFieldValue },
       include,
+    });
+  }
+
+  async findById(id: number): Promise<T | null> {
+    return await this.prisma[this.model].findUnique({
+      where: { id }
     });
   }
 

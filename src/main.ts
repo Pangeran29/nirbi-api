@@ -25,7 +25,8 @@ async function bootstrap() {
   await app.listen(configService.getOrThrow('PORT'), async () => {
     const prefix = configService.getOrThrow('PREFIX_NAME');
     logger.warn(`Swagger is running on: ${await app.getUrl()}/${prefix}/docs`);
-    logger.warn(`Application is running on: ${await app.getUrl()}`);
+    logger.warn(`Application (HTTP) is running on: ${await app.getUrl()}`);
+    logger.warn(`Application (WS) is running on: ${await app.getUrl()}/chat`);
   });
 }
 bootstrap();

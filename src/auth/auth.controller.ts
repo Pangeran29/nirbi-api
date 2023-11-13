@@ -48,7 +48,7 @@ export class AuthController {
       const registerData = new RegisterDto();
       registerData.email = email;
       registerData.name = name;
-      registerData.auth_method = $Enums.AUTH_METHOD.GOOGLE_OAUTH;
+      registerData.authMethod = $Enums.AUTH_METHOD.GOOGLE_OAUTH;
       user = await this.authService.register(registerData);
     }
     const token = await this.authService.getLoginToken(user);

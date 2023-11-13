@@ -10,19 +10,6 @@ export type User = any;
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  private readonly users = [
-    {
-      userId: 1,
-      username: 'john',
-      password: 'changeme',
-    },
-    {
-      userId: 2,
-      username: 'maria',
-      password: 'guess',
-    },
-  ];
-
   async findUserByEmail(email: string) {
     return await this.userRepository.findUnique({
       uniqueField: 'email',
@@ -38,8 +25,8 @@ export class UserService {
     return `This action returns all user`;
   }
 
-  async findOne(username: string): Promise<User | undefined> {
-    return this.users.find((user) => user.username === username);
+  async findOne(id: number): Promise<User | undefined> {
+    return await this.userRepository.findById(id);
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

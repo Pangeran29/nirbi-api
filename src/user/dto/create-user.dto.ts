@@ -5,7 +5,7 @@ export class CreateUserDto implements User {
   email: string;
   name: string;
   password: string;
-  auth_method: $Enums.AUTH_METHOD;
+  authMethod: $Enums.AUTH_METHOD;
   createdAt: Date;
   updatedAt: Date;
 }

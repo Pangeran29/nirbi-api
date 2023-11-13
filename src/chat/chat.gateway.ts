@@ -1,33 +1,39 @@
+import { BAD_REQ_EXC_MSG, FORBIDDEN_EXC_MSG, NOT_FOUND_EXC_MSG } from '@app/common/exception/message';
+import { ValidationType } from '@app/common/pipe/type/validation-pipe.type';
+import { FileSystemService } from '@app/helper';
+import { HttpStatus, Logger, OnModuleInit } from '@nestjs/common';
 import {
-  WebSocketGateway,
-  SubscribeMessage,
-  MessageBody,
-  WebSocketServer,
   ConnectedSocket,
+  MessageBody,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
 } from '@nestjs/websockets';
-import { ChatService } from './chat.service';
 import { Server, Socket } from 'socket.io';
-import { HttpStatus, Logger, OnModuleInit, ValidationPipe } from '@nestjs/common';
-import { SOCKET_EVENT } from './enum/socket-event.enum';
-import { SendMessageDto } from './dto/send-message.dto';
-import { ToJsonPipe } from '../../libs/common/src/pipe/to-json.pipe';
-import { FORBIDDEN_EXC_MSG } from '@app/common/exception/message';
-import { WebSocketError } from './types/web-socket-error.type';
 import { AuthService } from 'src/auth/auth.service';
-import { UserAccessToken } from 'src/auth/type/user-access-token.type';
 import { ExtractJWT } from 'src/auth/type/extract-jwt.type';
+import { UserAccessToken } from 'src/auth/type/user-access-token.type';
+import { UserService } from 'src/user/user.service';
+import { ToJsonPipe } from '../../libs/common/src/pipe/to-json.pipe';
+import { ChatService } from './chat.service';
+import { SendMessageDto } from './dto/send-message.dto';
+import { SendMessagePipe } from './dto/send-message.pipe';
+import { SOCKET_EVENT } from './enum/socket-event.enum';
+import { WebSocketError } from './types/web-socket-error.type';
 
 @WebSocketGateway({ namespace: 'chat' })
 export class ChatGateway implements OnModuleInit {
   @WebSocketServer()
-  server: Server;
+  private readonly server: Server;
 
-  private connectedUsers: Map<number, Socket> = new Map();
+  private readonly connectedUsers: Map<number, Socket> = new Map();
   private readonly logger = new Logger(ChatGateway.name);
 
   constructor(
     private readonly chatService: ChatService,
+    private readonly userService: UserService,
     private readonly authService: AuthService,
+    private readonly fileSystemService: FileSystemService
   ) { }
 
   /**
@@ -39,7 +45,7 @@ export class ChatGateway implements OnModuleInit {
       if (bearerToken) {
         const accessToken = bearerToken.split(' ')[1];
         const { isSuccess, currentUserMetadata }: ExtractJWT =
-        await this.authService.extractJWTAccessToken(accessToken);
+          await this.authService.extractJWTAccessToken(accessToken);
         if (!isSuccess) {
           return this._handleInvalidJWT(socket);
         }
@@ -48,7 +54,56 @@ export class ChatGateway implements OnModuleInit {
       } else {
         this._handleInvalidJWT(socket);
       }
-      this.logger.debug(`a new connection with socker id ${socket.id}`);
+    });
+  }
+
+  /**
+   * Sending message between two client
+   * @param client Current user socket instance
+   * @param param1 send message dto
+   * @todo assign a uuid instead of user id, handle message when receiver is not active, integrating with redis
+   */
+  @SubscribeMessage(SOCKET_EVENT.SEND_MESSAGE)
+  async onNewMessage(
+    @ConnectedSocket()
+    sender: Socket,
+    @MessageBody(new ToJsonPipe(), new SendMessagePipe())
+    sendMessageValidation: ValidationType,
+  ) {
+    const { isValidObject, errors, value } = sendMessageValidation;
+    if (!isValidObject) {
+      return this._handleBodyValidation(sender, errors);
+    }
+
+    const { receiverId, message, mediaUrl } = value as SendMessageDto;
+    if (mediaUrl) {
+      const isMediaExist = await this.fileSystemService.checkPathExist(mediaUrl);
+      if (!isMediaExist) {
+        return this._handleBodyValidation(sender, { message: NOT_FOUND_EXC_MSG.FILE_NOT_FOUND });
+      }
+    }
+
+    const isUserExist = await this.userService.findOne(receiverId);
+    if (!isUserExist) {
+      return this._handleUserNotFound(sender);
+    }
+
+    const receiver = this.connectedUsers.get(receiverId);
+    if (!receiver) {
+      // handle message when receiver is not active
+    }
+
+    const currentUser: UserAccessToken = sender['CurrentUser'];
+    await this.chatService.create(currentUser.sub, value);
+
+    receiver.emit(SOCKET_EVENT.ON_SEND_MESSAGE, {
+      message,
+      from: currentUser,
+    });
+
+    sender.emit(SOCKET_EVENT.ON_SEND_MESSAGE, {
+      message,
+      from: currentUser,
     });
   }
 
@@ -66,47 +121,27 @@ export class ChatGateway implements OnModuleInit {
     socket.disconnect(true);
   }
 
-  /**
-   * Handle validation of access token, trigger disconnect if token invalid
-   * @param accessToken JWT
-   * @param socket current user socket instance
-   * @returns void | UserAccessToken
-   * @type void | UserAccessToken
-   */
-  private async _handleAccessToken(
-    accessToken: string,
-    socket: Socket,
-  ): Promise<ExtractJWT | void> {
-    const { isSuccess, currentUserMetadata }: ExtractJWT =
-      await this.authService.extractJWTAccessToken(accessToken);
-    if (!isSuccess) {
-      return this._handleInvalidJWT(socket);
-    }
-    return { isSuccess, currentUserMetadata };
+  private _handleUserNotFound(socket: Socket): void {
+    const error: WebSocketError = {
+      success: false,
+      statusCode: HttpStatus.NOT_FOUND,
+      message: NOT_FOUND_EXC_MSG.USER_NOT_FOUND,
+    };
+    socket.emit(SOCKET_EVENT.EXCEPTION, error);
   }
 
-  /**
-   * Sending message between two client
-   * @param client Current user socket instance
-   * @param param1 send message dto
-   * @todo emit error for dto exception, save chat funcionality, integrating with redis
-   */
-  @SubscribeMessage(SOCKET_EVENT.SEND_MESSAGE)
-  async onNewMessage(
-    @ConnectedSocket()
-    client: Socket,
-    @MessageBody(new ToJsonPipe(), new ValidationPipe())
-    { receiverId, message }: SendMessageDto,
-  ) {
-    const sender = client['CurrentUser'];
-    const receiverClient = this.connectedUsers.get(receiverId);
-    receiverClient.emit(SOCKET_EVENT.ON_SEND_MESSAGE, {
-      message,
-      from: sender,
+  private _handleBodyValidation(socket: Socket, errors: any) {
+    const errorMessages = errors.map((error) => {
+      const constraintKeys = Object.keys(error.constraints);
+      const errorMessage = constraintKeys.map((key) => error.constraints[key]);
+      return errorMessage;
     });
-    client.emit(SOCKET_EVENT.ON_SEND_MESSAGE, {
-      message,
-      from: 'self',
-    });
+    const error: WebSocketError = {
+      success: false,
+      statusCode: HttpStatus.BAD_REQUEST,
+      message: BAD_REQ_EXC_MSG.INVALID_INPUT_BODY,
+      errors: errorMessages.flat()
+    };
+    return socket.emit(SOCKET_EVENT.EXCEPTION, error);
   }
 }

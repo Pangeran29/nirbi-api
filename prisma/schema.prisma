@@ -6,31 +6,48 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id          Int          @unique @default(autoincrement())
-  email       String?      @unique
-  name        String?
-  password    String?
-  auth_method AUTH_METHOD?
+  id         Int          @unique @default(autoincrement())
+  email      String?      @unique
+  name       String?
+  password   String?
+  authMethod AUTH_METHOD?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  Status Status[]
+  Status       Status[]
+  ChatSender   Chat[]   @relation(name: "ChatSender")
+  ChatReceiver Chat[]   @relation("ChatReceiver")
 }
 
 model Status {
-  id              Int             @unique @default(autoincrement())
-  type_of_content TYPE_OF_CONTENT
-  description     String?         @db.Text
-  media           String?
+  id            Int            @unique @default(autoincrement())
+  typeOfContent TYPE_OF_STATUS
+  description   String?        @db.Text
+  media         String?
 
-  User    User @relation(references: [id], fields: [user_id])
-  user_id Int
+  User   User @relation(references: [id], fields: [userId])
+  userId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Chat {
+  id         Int          @unique @default(autoincrement())
+  message    String       @db.Text
+  mediaUrl   String?
+  typeOfChat TYPE_OF_CHAT
+
+  ChatSender   User @relation(name: "ChatSender", references: [id], fields: [senderId])
+  senderId     Int
+  ChatReceiver User @relation(name: "ChatReceiver", references: [id], fields: [receiverId])
+  receiverId   Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -41,8 +58,12 @@ enum AUTH_METHOD {
   LOCAL_AUTH
 }
 
-enum TYPE_OF_CONTENT {
-  TEXT
-  PICTURE
-  VIDEO
+enum TYPE_OF_CHAT {
+  TEXT_ONLY
+  TEXT_MEDIA
+}
+
+enum TYPE_OF_STATUS {
+  TEXT_ONLY
+  TEXT_MEDIA
 }

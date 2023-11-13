@@ -7,11 +7,11 @@ export class CreateStatusDto implements Partial<Prisma.StatusCreateInput> {
     description: `
     type of status content. the value for this input can be found in /
     `,
-    enum: $Enums.TYPE_OF_CONTENT,
+    enum: $Enums.TYPE_OF_STATUS,
   })
   @IsNotEmpty()
-  @IsEnum($Enums.TYPE_OF_CONTENT)
-  type_of_content: $Enums.TYPE_OF_CONTENT;
+  @IsEnum($Enums.TYPE_OF_STATUS)
+  typeOfContent: $Enums.TYPE_OF_STATUS;
 
   @ApiProperty({
     description: `

@@ -1,26 +1,26 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-  Query,
-} from '@nestjs/common';
-import { StatusService } from './status.service';
-import { CreateStatusDto } from './dto/create-status.dto';
-import { UpdateStatusDto } from './dto/update-status.dto';
-import { CurrentUser } from '@app/common/decorator/current-user.decorator';
-import { UserAccessToken } from 'src/auth/type/user-access-token.type';
-import { JwtAuthGuard } from '@app/common/guard';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { FileSystemService } from '@app/helper';
-import { RecordNotFoundException } from '@app/common/exception/prisma';
-import { NOT_FOUND_EXC_MSG } from '@app/common/exception/message';
 import { ResponseInterceptorType } from '@app/common';
+import { CurrentUser } from '@app/common/decorator/current-user.decorator';
+import { NOT_FOUND_EXC_MSG } from '@app/common/exception/message';
+import { RecordNotFoundException } from '@app/common/exception/prisma';
+import { JwtAuthGuard } from '@app/common/guard';
+import { FileSystemService } from '@app/helper';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { UserAccessToken } from 'src/auth/type/user-access-token.type';
+import { CreateStatusDto } from './dto/create-status.dto';
 import { FindManyStatusDto } from './dto/find-many-status.dto';
+import { UpdateStatusDto } from './dto/update-status.dto';
+import { StatusService } from './status.service';
 
 @ApiBearerAuth()
 @ApiTags('status')
@@ -29,7 +29,7 @@ export class StatusController {
   constructor(
     private readonly statusService: StatusService,
     private readonly fileSystemService: FileSystemService,
-  ) {}
+  ) { }
 
   @UseGuards(JwtAuthGuard)
   @Post()

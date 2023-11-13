@@ -28,5 +28,5 @@ export class RegisterDto implements Partial<User> {
   })
   @IsOptional()
   @IsEnum($Enums.AUTH_METHOD)
-  auth_method?: $Enums.AUTH_METHOD = $Enums.AUTH_METHOD.LOCAL_AUTH;
+  authMethod?: $Enums.AUTH_METHOD = $Enums.AUTH_METHOD.LOCAL_AUTH;
 }
