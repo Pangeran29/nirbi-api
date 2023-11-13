@@ -1,17 +1,16 @@
 version: "3.9"
 services:
-  postgres:
-    image: postgres:latest
-    container_name: postgres
-    hostname: postgres
+  mysql:
+    image: mysql:latest
+    container_name: nirbi-mysql
+    hostname: mysql
     ports:
-      - 5432:5432
+      - ${MYSQL_PORT}:${MYSQL_PORT}
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DB: ${MYSQL_DB}
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - db:/var/lib/mysql
     restart: unless-stopped
 
   api:
@@ -19,12 +18,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: api
+    container_name: nirbi-api
     depends_on:
-      - postgres
+      - mysql
     ports:
-      - "3000:3000"
+      - ${PORT}:${PORT}
     restart: always
 
 volumes:
-  postgres-data:
+  db:
