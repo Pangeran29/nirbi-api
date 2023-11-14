@@ -31,7 +31,7 @@ import { ChatModule } from './chat/chat.module';
       rootPath: join(__dirname, '..', ''),
     }),
     AuthModule,
-    PrismaModule,
+    // PrismaModule,
     UserModule,
     FileUploadModule,
     StatusModule,
